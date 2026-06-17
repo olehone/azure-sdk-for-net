@@ -17,11 +17,11 @@ using Azure.Security.KeyVault.Secrets.Models;
 namespace Azure.Security.KeyVault.Secrets
 {
     /// <summary> The key vault client performs cryptographic key operations and vault operations against the Key Vault service. </summary>
-    public partial class KeyVaultSecretsClient
+internal partial class KeyVaultSecretsClient
     {
-        private readonly Uri _endpoint;
+        internal Uri _endpoint;
         private static readonly string[] AuthorizationScopes = new string[] { "https://vault.azure.net/.default" };
-        private readonly string _apiVersion;
+        internal string _apiVersion;
 
         /// <summary> Initializes a new instance of KeyVaultSecretsClient for mocking. </summary>
         protected KeyVaultSecretsClient()
@@ -76,10 +76,10 @@ namespace Azure.Security.KeyVault.Secrets
         }
 
         /// <summary> The HTTP pipeline for sending and receiving REST requests and responses. </summary>
-        public virtual HttpPipeline Pipeline { get; }
+        public virtual HttpPipeline Pipeline { get; internal set; }
 
         /// <summary> The ClientDiagnostics is used to provide tracing support for the client library. </summary>
-        internal ClientDiagnostics ClientDiagnostics { get; }
+        internal ClientDiagnostics ClientDiagnostics { get; set; }
 
         /// <summary>
         /// [Protocol Method] The SET operation adds a secret to the Azure Key Vault. If the named secret already exists, Azure Key Vault creates a new version of that secret. This operation requires the secrets/set permission.
@@ -298,7 +298,7 @@ namespace Azure.Security.KeyVault.Secrets
                 Argument.AssertNotNullOrEmpty(secretName, nameof(secretName));
                 Argument.AssertNotNull(content, nameof(content));
 
-                using HttpMessage message = this.CreateUpdateSecretRequest(secretName, content, secretVersion, context);
+                using HttpMessage message = this.CreateUpdateSecretRequest(secretName, secretVersion, content, context);
                 return Pipeline.ProcessMessage(message, context);
             }
             catch (Exception e)
@@ -333,7 +333,7 @@ namespace Azure.Security.KeyVault.Secrets
                 Argument.AssertNotNullOrEmpty(secretName, nameof(secretName));
                 Argument.AssertNotNull(content, nameof(content));
 
-                using HttpMessage message = this.CreateUpdateSecretRequest(secretName, content, secretVersion, context);
+                using HttpMessage message = this.CreateUpdateSecretRequest(secretName, secretVersion, content, context);
                 return await Pipeline.ProcessMessageAsync(message, context).ConfigureAwait(false);
             }
             catch (Exception e)
